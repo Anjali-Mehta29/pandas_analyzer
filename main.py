@@ -8,7 +8,7 @@ class SalesDataAnalyzer:
 
     def __init__(self):
         self.data = None
-        self.garph = None
+        self.graph = None
 
     def load_data(self):
         try:
@@ -64,16 +64,16 @@ class SalesDataAnalyzer:
 
 
             if choice == 1 :
-                print(self.data['Sales'].sum())
+                print(self.data['TotalSales'].sum())
 
             elif choice == 2:
-                print(self.data.groupby("Product")["Sales"].sum().nlargest(5))
+                print(self.data.groupby("Product")["TotalSales"].sum().nlargest(5))
 
             elif choice == 3:
-                print(self.data.groupby("Product")["Sales"].sum().nsmallest(5))
+                print(self.data.groupby("Product")["TotalSales"].sum().nsmallest(5))
 
             elif choice == 4:
-                print(self.data.groupby("Region")["Sales"].sum().nlargest(1))
+                print(self.data.groupby("Region")["TotalSales"].sum().nlargest(1))
 
             elif choice == 5 :
                 print(self.data.groupby('Product')['Profit'].sum())
@@ -175,24 +175,32 @@ class SalesDataAnalyzer:
             print("6. Stack Plot ")
             choice=int(input("Enter your Choice : "))
 
-            if choice == 1 :
-    
+            if choice == 1:
+
                 column = input("Enter column name for X-axis (e.g. Product): ")
-                value = input("Enter numeric column for Y-axis (e.g. Sales): ")
+                value = input("Enter numeric column for Y-axis (e.g. TotalSales): ")
 
                 if column in self.data.columns and value in self.data.columns:
-                    data = self.data.groupby(column)[value].sum().sort_values(ascending=False)
-                    ax=data.plot(kind="bar", title=f"{value} by {column}")
+
+                    data = self.data.groupby(column)[value].sum()
+                    data = data.sort_values(ascending=False)
+
+                    ax = data.plot(
+                        kind="bar",
+                        figsize=(12, 6),
+                        title=f"{value} by {column}"
+                    )
+
                     plt.xlabel(column)
                     plt.ylabel(value)
-                    plt.xticks(rotation=45)
+                    plt.xticks(rotation=45, ha="right")
+                    plt.grid(axis="y", alpha=0.3)
                     plt.tight_layout()
                     self.graph = ax.get_figure()
                     plt.show()
                     return self.graph
                 else:
                     print("Invalid column name!")
-
     
             elif choice == 2 :
                 x = input("Enter X-axis column (e.g. Date): ")
@@ -257,10 +265,10 @@ class SalesDataAnalyzer:
                     print("Invalid column name!")
 
             elif choice == 6:
-                required = ["Region", "Sales", "Profit"]
+                required = ["Region", "TotalSales", "Profit"]
 
                 if all(column in self.data.columns for column in required):
-                    df = self.data.groupby("Region")[["Sales", "Profit"]].sum()
+                    df = self.data.groupby("Region")[["TotalSales", "Profit"]].sum()
                     df.plot(kind="bar", stacked=True, title="Sales and Profit by Region")
                     plt.xlabel("Region")
                     plt.ylabel("Amount")
@@ -272,7 +280,7 @@ class SalesDataAnalyzer:
                     print("CSV must contain Region, Sales, and Profit columns.")
 
             else :
-                print("Enter a valid Choice ! ")
+                print("Enter a valid Choice !")
         except:
             print("Something went wrong !")
 
